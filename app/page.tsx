@@ -11,12 +11,12 @@ export default function Home() {
 
   useEffect(() => {
     if (session) {
-      fetch('/api/stats', {
-        headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_KEY || '' }
-      })
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(() => {});
+      import('@/lib/api').then(({ apiRequest }) => {
+        apiRequest('/api/stats')
+          .then(res => res.json())
+          .then(data => setStats(data))
+          .catch(() => {});
+      });
     }
   }, [session]);
 
