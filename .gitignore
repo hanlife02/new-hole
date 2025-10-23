@@ -1,2 +1,4 @@
 .env.local
 .spec-workflow
+node_modules
+.next
