@@ -7,7 +7,7 @@ import HoleCard from '@/components/HoleCard';
 
 export default function KeySearch() {
   const { data: session } = useSession();
-  const [holes, setHoles] = useState([]);
+  const [holes, setHoles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [searchParams, setSearchParams] = useState({
