@@ -2,3 +2,4 @@
 .spec-workflow
 node_modules
 .next
+*.md
