@@ -18,6 +18,7 @@ interface SearchResult {
     searchType: string;
     total: number;
   };
+  error?: string;
 }
 
 export default function KeySearchPage() {
