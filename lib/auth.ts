@@ -240,7 +240,6 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-  trustHost: true,
   callbacks: {
     async jwt({ token, account }) {
       let extendedToken = token as ExtendedToken;
