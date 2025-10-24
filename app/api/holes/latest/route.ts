@@ -4,28 +4,33 @@ import pool from '@/lib/db';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const offset = parseInt(searchParams.get('offset') || '0');
     const limit = parseInt(searchParams.get('limit') || '20');
+    const cursorParam = searchParams.get('cursor');
+    const cursor = cursorParam ? parseInt(cursorParam, 10) : undefined;
+    const queryLimit = Math.max(1, limit);
+    const limitPlusOne = queryLimit + 1;
 
-    const latestPidQuery = 'SELECT pid FROM latest_pid WHERE id = 1';
-    const latestPidResult = await pool.query(latestPidQuery);
+    let holesQuery = `
+      SELECT * FROM holes
+      ORDER BY pid DESC
+      LIMIT $1
+    `;
+    const queryParams: Array<number> = [limitPlusOne];
 
-    if (latestPidResult.rows.length === 0) {
-      return NextResponse.json({ holes: [] });
+    if (Number.isFinite(cursor)) {
+      holesQuery = `
+        SELECT * FROM holes
+        WHERE pid < $1
+        ORDER BY pid DESC
+        LIMIT $2
+      `;
+      queryParams.splice(0, queryParams.length, cursor as number, limitPlusOne);
     }
 
-    const latestPid = latestPidResult.rows[0].pid;
-    const startPid = latestPid - offset;
-    const endPid = Math.max(1, startPid - limit + 1);
-
-    const holesQuery = `
-      SELECT * FROM holes
-      WHERE pid <= $1 AND pid >= $2
-      ORDER BY pid DESC
-    `;
-
-    const holesResult = await pool.query(holesQuery, [startPid, endPid]);
-    const holes = holesResult.rows;
+    const holesResult = await pool.query(holesQuery, queryParams);
+    const rows = holesResult.rows;
+    const hasMore = rows.length > queryLimit;
+    const holes = rows.slice(0, queryLimit);
 
     const holesWithComments = await Promise.all(
       holes.map(async (hole) => {
@@ -45,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       holes: holesWithComments,
-      hasMore: endPid > 1
+      hasMore,
     });
   } catch (error) {
     console.error('获取最新树洞失败:', error);

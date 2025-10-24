@@ -19,7 +19,6 @@ export default function LatestPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [visibleCount, setVisibleCount] = useState(20);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -31,32 +30,39 @@ export default function LatestPage() {
     fetchHoles();
   }, [session, status]);
 
-  const fetchHoles = async (offset = 0, isRefresh = false) => {
+  const fetchHoles = async (cursor?: number, isRefresh = false) => {
     try {
       if (isRefresh) {
         setRefreshing(true);
-      } else if (offset > 0) {
+      } else if (cursor !== undefined) {
         setLoadingMore(true);
       } else {
         setLoading(true);
       }
 
-      const response = await fetch(`/api/holes/latest?offset=${offset}&limit=20`);
+      const params = new URLSearchParams({ limit: '20' });
+      if (cursor !== undefined) {
+        params.set('cursor', String(cursor));
+      }
+
+      const response = await fetch(`/api/holes/latest?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
 
-        if (isRefresh || offset === 0) {
+        if (isRefresh || cursor === undefined) {
           setHoles(data.holes);
-          setVisibleCount(20);
         } else {
           setHoles(prev => {
-            const newHoles = [...prev, ...data.holes];
-            setVisibleCount(newHoles.length);
-            return newHoles;
+            const existingPids = new Set(prev.map((hole) => hole.pid));
+            const merged = [
+              ...prev,
+              ...data.holes.filter((hole: HoleWithComments) => !existingPids.has(hole.pid)),
+            ];
+            return merged;
           });
         }
 
-        setHasMore(data.hasMore);
+        setHasMore(Boolean(data.hasMore));
       }
     } catch (error) {
       console.error('获取树洞失败:', error);
@@ -68,15 +74,25 @@ export default function LatestPage() {
   };
 
   const handleRefresh = () => {
-    fetchHoles(0, true);
+    fetchHoles(undefined, true);
   };
 
   const loadMore = () => {
-    if (visibleCount >= holes.length && hasMore) {
-      fetchHoles(holes.length);
-    } else if (visibleCount < holes.length) {
-      setVisibleCount(prev => Math.min(prev + 20, holes.length));
+    if (!hasMore || loadingMore) {
+      return;
     }
+
+    const lastHole = holes[holes.length - 1];
+    if (!lastHole) {
+      return;
+    }
+
+    const lastPid = Number(lastHole.pid);
+    if (Number.isNaN(lastPid)) {
+      return;
+    }
+
+    fetchHoles(lastPid);
   };
 
   if (status === 'loading' || loading) {
@@ -94,8 +110,8 @@ export default function LatestPage() {
     return null;
   }
 
-  const displayedHoles = holes.slice(0, visibleCount);
-  const canLoadMore = visibleCount < holes.length || hasMore;
+  const displayedHoles = holes;
+  const canLoadMore = hasMore;
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] dark:bg-black">
