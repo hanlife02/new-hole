@@ -165,6 +165,32 @@ export const authOptions: NextAuthOptions = {
     },
   ],
   cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+    callbackUrl: {
+      name: `next-auth.callback-url`,
+      options: {
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+    csrfToken: {
+      name: `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
     pkceCodeVerifier: {
       name: 'next-auth.pkce.code_verifier',
       options: {
@@ -174,7 +200,27 @@ export const authOptions: NextAuthOptions = {
         secure: process.env.NODE_ENV === 'production',
       },
     },
+    state: {
+      name: 'next-auth.state',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 900,
+      },
+    },
+    nonce: {
+      name: 'next-auth.nonce',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
   },
+  useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
     async jwt({ token, account }) {
       let extendedToken = token as ExtendedToken;
