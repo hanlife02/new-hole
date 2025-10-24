@@ -172,7 +172,7 @@ export const authOptions: NextAuthOptions = {
         const expiresAt = account.expires_at
           ? account.expires_at * 1000
           : account.expires_in
-            ? Date.now() + account.expires_in * 1000
+            ? Date.now() + (Number(account.expires_in) * 1000)
             : undefined;
 
         extendedToken = {
