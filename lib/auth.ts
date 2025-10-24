@@ -164,6 +164,17 @@ export const authOptions: NextAuthOptions = {
       },
     },
   ],
+  cookies: {
+    pkceCodeVerifier: {
+      name: 'next-auth.pkce.code_verifier',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   callbacks: {
     async jwt({ token, account }) {
       let extendedToken = token as ExtendedToken;
