@@ -49,7 +49,11 @@ export default function LatestPage() {
           setHoles(data.holes);
           setVisibleCount(20);
         } else {
-          setHoles(prev => [...prev, ...data.holes]);
+          setHoles(prev => {
+            const newHoles = [...prev, ...data.holes];
+            setVisibleCount(newHoles.length);
+            return newHoles;
+          });
         }
 
         setHasMore(data.hasMore);
@@ -68,16 +72,10 @@ export default function LatestPage() {
   };
 
   const loadMore = () => {
-    if (visibleCount >= holes.length) {
-      if (hasMore) {
-        fetchHoles(holes.length);
-      }
-    } else {
-      const remaining = holes.length - visibleCount;
-      if (remaining < 20 && hasMore) {
-        fetchHoles(holes.length);
-      }
-      setVisibleCount(prev => prev + 20);
+    if (visibleCount >= holes.length && hasMore) {
+      fetchHoles(holes.length);
+    } else if (visibleCount < holes.length) {
+      setVisibleCount(prev => Math.min(prev + 20, holes.length));
     }
   };
 

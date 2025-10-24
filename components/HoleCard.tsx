@@ -15,15 +15,20 @@ export function HoleCard({ hole }: HoleCardProps) {
   const common = pagesCopy[language].common;
   const [showAllComments, setShowAllComments] = useState(false);
   const [visibleComments, setVisibleComments] = useState(2);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   const displayedComments = showAllComments
     ? hole.comments
     : hole.comments.slice(0, visibleComments);
 
-  const locale = language === 'zh' ? 'zh-CN' : 'en-US';
-
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString(locale);
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   };
 
   const loadMoreComments = () => {
@@ -56,63 +61,87 @@ export function HoleCard({ hole }: HoleCardProps) {
   }, [common, hole.comments.length, visibleComments]);
 
   return (
-    <div className="border border-black dark:border-white rounded-lg p-6 bg-white dark:bg-black">
+    <div className="bg-white dark:bg-[#1d1d1f] rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400">{hole.pid}</div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-base font-medium text-gray-500 dark:text-gray-400">#{hole.pid}</div>
+        <div className="text-sm text-gray-400 dark:text-gray-500">
           {formatDate(hole.created_at)}
         </div>
       </div>
 
-      <div className="mb-4">
-        <p className="text-black dark:text-white whitespace-pre-wrap">{hole.text}</p>
+      <div className="mb-5">
+        <p className="text-black dark:text-white whitespace-pre-wrap leading-relaxed">{hole.text}</p>
         {hole.type === 'image' && hole.image_response && (
-          <div className="mt-4 flex justify-center">
-            <img
-              src={hole.image_response}
-              alt={common.imageAlt}
-              className="h-auto w-2/5 min-w-[160px] rounded-lg border border-gray-300 object-contain dark:border-gray-700"
-            />
-          </div>
+          <>
+            <div className="mt-4 flex justify-center">
+              <img
+                src={hole.image_response}
+                alt={common.imageAlt}
+                className="h-auto w-2/5 min-w-[160px] rounded-xl object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setShowImageModal(true)}
+              />
+            </div>
+            {showImageModal && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+                onClick={() => setShowImageModal(false)}
+              >
+                <div className="relative max-h-[90vh] max-w-[90vw]">
+                  <img
+                    src={hole.image_response}
+                    alt={common.imageAlt}
+                    className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                  <button
+                    onClick={() => setShowImageModal(false)}
+                    className="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      <div className="flex items-center space-x-4 mb-4">
-        <div className="flex items-center space-x-1">
-          <Star className="h-4 w-4 text-black dark:text-white" />
-          <span className="text-sm text-black dark:text-white">{hole.likenum}</span>
+      <div className="flex items-center gap-6 mb-4">
+        <div className="flex items-center gap-2">
+          <Star className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">{hole.likenum}</span>
         </div>
-        <div className="flex items-center space-x-1">
-          <MessageCircle className="h-4 w-4 text-black dark:text-white" />
-          <span className="text-sm text-black dark:text-white">{hole.reply}</span>
+        <div className="flex items-center gap-2">
+          <MessageCircle className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+          <span className="text-sm text-gray-600 dark:text-gray-400">{hole.reply}</span>
         </div>
       </div>
 
       {hole.comments.length > 0 && (
-        <div className="border-t border-gray-300 dark:border-gray-700 pt-4">
-          <h4 className="text-sm font-medium text-black dark:text-white mb-3">
+        <div className="border-t border-gray-100 dark:border-gray-800 pt-5">
+          <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
             {common.commentsHeading} ({hole.comments.length})
           </h4>
 
           <div className="space-y-3">
             {displayedComments.map((comment) => (
-              <div key={comment.cid} className="rounded bg-gray-50 p-3 dark:bg-gray-900">
+              <div key={comment.cid} className="bg-[#f5f5f7] dark:bg-black rounded-xl p-4">
                 <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-black dark:text-white">
                       {comment.name}
                     </span>
                     {getReplyText(comment) && (
-                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {getReplyText(comment)}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     {formatDate(comment.created_at)}
                   </span>
                 </div>
-                <p className="text-sm text-black dark:text-white whitespace-pre-wrap">
+                <p className="text-sm text-black dark:text-white whitespace-pre-wrap leading-relaxed">
                   {comment.text}
                 </p>
               </div>
@@ -122,7 +151,7 @@ export function HoleCard({ hole }: HoleCardProps) {
           {hole.comments.length > 2 && !showAllComments && (
             <button
               onClick={loadMoreComments}
-              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
+              className="mt-4 flex items-center gap-1.5 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
             >
               <ChevronDown className="h-4 w-4" />
               <span>{loadMoreLabel}</span>
@@ -135,7 +164,7 @@ export function HoleCard({ hole }: HoleCardProps) {
                 setShowAllComments(false);
                 setVisibleComments(2);
               }}
-              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
+              className="mt-4 flex items-center gap-1.5 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
             >
               <ChevronUp className="h-4 w-4" />
               <span>{common.collapseComments}</span>

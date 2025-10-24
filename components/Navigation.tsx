@@ -28,9 +28,9 @@ export function Navigation() {
         <div className="flex items-center gap-6">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm font-semibold tracking-tight text-black transition-colors duration-300 whitespace-nowrap dark:text-white"
+            className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-black transition-colors duration-300 whitespace-nowrap dark:text-white"
           >
-            <Image src="/Ethan-Club-o.PNG" alt="Ethan Hole" width={28} height={28} className="rounded-full" />
+            <Image src="/Ethan-Club-o.PNG" alt="Ethan Hole" width={36} height={36} className="rounded-full" />
             Ethan Hole
           </Link>
           <div className="hidden items-center gap-6 md:flex">
