@@ -32,6 +32,11 @@ const casdoorEndpoint = process.env.CASDOOR_ENDPOINT
   ? process.env.CASDOOR_ENDPOINT.replace(/\/+$/, '')
   : undefined;
 
+const nextAuthUrl = process.env.NEXTAUTH_URL;
+const cookieSecure = nextAuthUrl
+  ? nextAuthUrl.startsWith('https://')
+  : process.env.NODE_ENV === 'production';
+
 function ensureCasdoorEndpoint() {
   if (!casdoorEndpoint) {
     throw new Error('CASDOOR_ENDPOINT is not configured');
@@ -171,7 +176,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
       },
     },
     callbackUrl: {
@@ -179,7 +184,7 @@ export const authOptions: NextAuthOptions = {
       options: {
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
       },
     },
     csrfToken: {
@@ -188,7 +193,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
       },
     },
     pkceCodeVerifier: {
@@ -197,7 +202,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
       },
     },
     state: {
@@ -206,7 +211,7 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
         maxAge: 900,
       },
     },
@@ -216,11 +221,11 @@ export const authOptions: NextAuthOptions = {
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production',
+        secure: cookieSecure,
       },
     },
   },
-  useSecureCookies: process.env.NODE_ENV === 'production',
+  useSecureCookies: cookieSecure,
   callbacks: {
     async jwt({ token, account }) {
       let extendedToken = token as ExtendedToken;
