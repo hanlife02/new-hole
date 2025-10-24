@@ -1,16 +1,20 @@
 'use client';
 
 import { useSession, signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { HoleCard } from '@/components/HoleCard';
 import { HoleWithComments, HotHoleFilters } from '@/types';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { useLanguage } from '@/components/LanguageProvider';
+import pagesCopy from '@/content/pages.json';
 
 export default function HotPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
+  const { language } = useLanguage();
+  const pageCopy = pagesCopy[language];
+  const copy = pageCopy.hot;
+  const common = pageCopy.common;
   const [holes, setHoles] = useState<HoleWithComments[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -31,7 +35,7 @@ export default function HotPage() {
       signIn('casdoor');
       return;
     }
-  }, [session, status, router]);
+  }, [session, status]);
 
   const fetchHoles = async (offset = 0) => {
     try {
@@ -81,6 +85,7 @@ export default function HotPage() {
 
   const handleThresholdChange = (value: string) => {
     if (value === 'custom') {
+      setFilters(prev => ({ ...prev, threshold: -1 }));
       setCustomThreshold('');
     } else {
       setFilters(prev => ({ ...prev, threshold: parseInt(value) }));
@@ -100,7 +105,7 @@ export default function HotPage() {
       <div className="min-h-screen bg-white dark:bg-black">
         <Navigation />
         <div className="flex items-center justify-center py-20">
-          <div className="text-black dark:text-white">加载中...</div>
+          <div className="text-black dark:text-white">{common.loading}</div>
         </div>
       </div>
     );
@@ -113,82 +118,82 @@ export default function HotPage() {
   const presetThresholds = [20, 50, 100, 300];
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-black">
       <Navigation />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-black dark:text-white mb-8">
-          热点树洞
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-4xl font-semibold text-black dark:text-white mb-10">
+          {copy.title}
         </h1>
 
-        <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div className="bg-white dark:bg-[#1d1d1f] p-8 rounded-3xl mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                时间范围
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                {copy.filters.timeRange}
               </label>
               <select
                 value={filters.timeRange}
                 onChange={(e) => setFilters(prev => ({ ...prev, timeRange: e.target.value as any }))}
-                className="w-full p-2 border border-black dark:border-white rounded bg-white dark:bg-black text-black dark:text-white"
+                className="w-full p-3 border-0 bg-[#f5f5f7] dark:bg-black rounded-xl text-black dark:text-white"
               >
-                <option value="24h">24小时内</option>
-                <option value="3d">3天内</option>
-                <option value="7d">7天内</option>
+                <option value="24h">{copy.filters.timeOptions['24h']}</option>
+                <option value="3d">{copy.filters.timeOptions['3d']}</option>
+                <option value="7d">{copy.filters.timeOptions['7d']}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                排序方式
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                {copy.filters.sortBy}
               </label>
               <select
                 value={filters.sortBy}
                 onChange={(e) => setFilters(prev => ({ ...prev, sortBy: e.target.value as any }))}
-                className="w-full p-2 border border-black dark:border-white rounded bg-white dark:bg-black text-black dark:text-white"
+                className="w-full p-3 border-0 bg-[#f5f5f7] dark:bg-black rounded-xl text-black dark:text-white"
               >
-                <option value="star">收藏数</option>
-                <option value="reply">回复数</option>
-                <option value="both">收藏数+回复数</option>
+                <option value="star">{copy.filters.sortOptions.star}</option>
+                <option value="reply">{copy.filters.sortOptions.reply}</option>
+                <option value="both">{copy.filters.sortOptions.both}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                阈值
+              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                {copy.filters.threshold}
               </label>
               <select
                 value={presetThresholds.includes(filters.threshold) ? filters.threshold.toString() : 'custom'}
                 onChange={(e) => handleThresholdChange(e.target.value)}
-                className="w-full p-2 border border-black dark:border-white rounded bg-white dark:bg-black text-black dark:text-white"
+                className="w-full p-3 border-0 bg-[#f5f5f7] dark:bg-black rounded-xl text-black dark:text-white"
               >
                 {presetThresholds.map(threshold => (
                   <option key={threshold} value={threshold.toString()}>
                     {threshold}
                   </option>
                 ))}
-                <option value="custom">自定义</option>
+                <option value="custom">{copy.filters.customOption}</option>
               </select>
             </div>
 
-            {!presetThresholds.includes(filters.threshold) && (
-              <div>
-                <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                  自定义阈值
+            {filters.threshold === -1 && (
+              <div className="md:col-span-2 lg:col-span-3">
+                <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                  {copy.filters.customThreshold}
                 </label>
-                <div className="flex space-x-2">
+                <div className="flex gap-3">
                   <input
                     type="number"
                     value={customThreshold}
                     onChange={(e) => setCustomThreshold(e.target.value)}
-                    placeholder="输入数值"
-                    className="flex-1 p-2 border border-black dark:border-white rounded bg-white dark:bg-black text-black dark:text-white"
+                    placeholder={copy.filters.customThresholdPlaceholder}
+                    className="flex-1 p-3 border-0 bg-[#f5f5f7] dark:bg-black rounded-xl text-black dark:text-white [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={handleCustomThresholdSubmit}
-                    className="px-3 py-2 border border-black dark:border-white rounded hover:bg-gray-100 dark:hover:bg-gray-800 text-black dark:text-white"
+                    className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-xl text-sm font-medium hover:opacity-80"
                   >
-                    确定
+                    {copy.filters.customThresholdConfirm}
                   </button>
                 </div>
               </div>
@@ -198,46 +203,43 @@ export default function HotPage() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="flex items-center space-x-2 px-6 py-2 bg-black dark:bg-white text-white dark:text-black rounded hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-8 py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:opacity-80 disabled:opacity-50"
           >
             <Search className="h-4 w-4" />
-            <span>{loading ? '查询中...' : '查询'}</span>
+            <span>{loading ? copy.searching : copy.searchButton}</span>
           </button>
         </div>
 
         {hasSearched && (
           <>
             <div className="mb-6">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                找到 {total} 个符合条件的热点树洞
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {copy.results.replace('{count}', total.toString())}
               </p>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               {holes.map((hole) => (
                 <HoleCard key={hole.pid} hole={hole} />
               ))}
             </div>
 
             {holes.length === 0 && !loading && (
-              <div className="text-center py-20">
-                <div className="text-gray-600 dark:text-gray-400">
-                  没有找到符合条件的热点树洞
+              <div className="text-center py-32">
+                <div className="text-gray-500 dark:text-gray-400 text-lg">
+                  {copy.empty}
                 </div>
               </div>
             )}
 
             {hasMore && holes.length > 0 && (
-              <div className="flex justify-center mt-8">
+              <div className="flex justify-center mt-12">
                 <button
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="flex items-center space-x-2 px-6 py-3 border border-black dark:border-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors disabled:opacity-50"
+                  className="px-8 py-3 bg-white dark:bg-[#1d1d1f] text-black dark:text-white rounded-full text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2d2d2f] disabled:opacity-50"
                 >
-                  <ChevronDown className="h-4 w-4 text-black dark:text-white" />
-                  <span className="text-black dark:text-white">
-                    {loadingMore ? '加载中...' : '加载更多'}
-                  </span>
+                  {loadingMore ? copy.loadingMore : copy.loadMore}
                 </button>
               </div>
             )}
@@ -245,10 +247,7 @@ export default function HotPage() {
         )}
 
         {!hasSearched && (
-          <div className="text-center py-20">
-            <div className="text-gray-600 dark:text-gray-400">
-              请设置筛选条件并点击查询按钮
-            </div>
+          <div className="text-center py-32">
           </div>
         )}
       </main>

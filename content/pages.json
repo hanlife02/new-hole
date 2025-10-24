@@ -1,0 +1,176 @@
+{
+  "zh": {
+    "common": {
+      "loading": "加载中...",
+      "commentsHeading": "评论",
+      "expandAllComments": "展开所有评论",
+      "loadMoreComments": "加载更多评论 ({count} 条)",
+      "collapseComments": "收起评论",
+      "replyPrefix": "回复",
+      "replyFallback": "回复评论",
+      "imageAlt": "树洞图片"
+    },
+    "latest": {
+      "title": "最新树洞",
+      "refresh": "刷新",
+      "refreshing": "刷新中...",
+      "empty": "暂无树洞",
+      "loadMore": "加载更多",
+      "loadingMore": "加载中..."
+    },
+    "hot": {
+      "title": "热点树洞",
+      "filters": {
+        "timeRange": "时间范围",
+        "sortBy": "排序方式",
+        "threshold": "阈值",
+        "customThreshold": "自定义阈值",
+        "customThresholdPlaceholder": "输入数值",
+        "customThresholdConfirm": "确定",
+        "timeOptions": {
+          "24h": "24小时内",
+          "3d": "3天内",
+          "7d": "7天内"
+        },
+        "sortOptions": {
+          "star": "收藏数",
+          "reply": "回复数",
+          "both": "收藏数+回复数"
+        },
+        "customOption": "自定义"
+      },
+      "searchButton": "查询",
+      "searching": "查询中...",
+      "results": "找到 {count} 个符合条件的热点树洞",
+      "empty": "没有找到符合条件的热点树洞",
+      "prompt": "请设置筛选条件并点击查询按钮",
+      "loadMore": "加载更多",
+      "loadingMore": "加载中..."
+    },
+    "pid": {
+      "title": "洞号查询",
+      "inputLabel": "输入树洞洞号",
+      "placeholder": "12345",
+      "searchButton": "查询",
+      "searching": "查询中...",
+      "errors": {
+        "empty": "请输入洞号",
+        "invalid": "洞号必须是正整数",
+        "generic": "查询失败，请稍后重试"
+      },
+      "notFound": "未找到指定洞号的树洞",
+      "prompt": "请输入洞号并点击查询按钮"
+    },
+    "keySearch": {
+      "title": "内容搜索",
+      "inputLabel": "输入关键词（用空格分隔多个关键词）",
+      "placeholder": "学习 考试 编程",
+      "modeLabel": "搜索方式",
+      "modeOr": "或搜索",
+      "modeAnd": "与搜索",
+      "searchButton": "搜索",
+      "searching": "搜索中...",
+      "errors": {
+        "empty": "请输入关键词",
+        "generic": "搜索失败，请稍后重试"
+      },
+      "summary": "搜索关键词: {keywords} | 搜索方式: {mode} | 找到 {count} 个结果",
+      "summaryMode": {
+        "or": "或搜索",
+        "and": "与搜索"
+      },
+      "empty": "没有找到包含指定关键词的树洞",
+      "prompt": "请输入关键词并点击搜索按钮",
+      "hint": "支持多关键词搜索，用空格分隔关键词",
+      "loadMore": "加载更多",
+      "loadingMore": "加载中..."
+    }
+  },
+  "en": {
+    "common": {
+      "loading": "Loading...",
+      "commentsHeading": "Comments",
+      "expandAllComments": "Show all comments",
+      "loadMoreComments": "Load more comments ({count} left)",
+      "collapseComments": "Collapse comments",
+      "replyPrefix": "Reply to",
+      "replyFallback": "Reply",
+      "imageAlt": "Treehole image"
+    },
+    "latest": {
+      "title": "Latest Posts",
+      "refresh": "Refresh",
+      "refreshing": "Refreshing...",
+      "empty": "No posts yet",
+      "loadMore": "Load more",
+      "loadingMore": "Loading..."
+    },
+    "hot": {
+      "title": "Trending Posts",
+      "filters": {
+        "timeRange": "Time range",
+        "sortBy": "Sort by",
+        "threshold": "Threshold",
+        "customThreshold": "Custom threshold",
+        "customThresholdPlaceholder": "Enter a value",
+        "customThresholdConfirm": "Apply",
+        "timeOptions": {
+          "24h": "Last 24 hours",
+          "3d": "Last 3 days",
+          "7d": "Last 7 days"
+        },
+        "sortOptions": {
+          "star": "Stars",
+          "reply": "Replies",
+          "both": "Stars + Replies"
+        },
+        "customOption": "Custom"
+      },
+      "searchButton": "Search",
+      "searching": "Searching...",
+      "results": "{count} trending posts match your filters",
+      "empty": "No trending posts match your filters",
+      "prompt": "Adjust the filters, then tap search to continue",
+      "loadMore": "Load more",
+      "loadingMore": "Loading..."
+    },
+    "pid": {
+      "title": "Hole ID Lookup",
+      "inputLabel": "Enter a hole ID",
+      "placeholder": "12345",
+      "searchButton": "Search",
+      "searching": "Searching...",
+      "errors": {
+        "empty": "Please enter a hole ID",
+        "invalid": "Hole ID must be a positive integer",
+        "generic": "Search failed, please try again later"
+      },
+      "notFound": "No hole was found for that ID",
+      "prompt": "Enter a hole ID and press search"
+    },
+    "keySearch": {
+      "title": "Content Search",
+      "inputLabel": "Enter keywords (separate multiple keywords with spaces)",
+      "placeholder": "study exam coding",
+      "modeLabel": "Search mode",
+      "modeOr": "OR search",
+      "modeAnd": "AND search",
+      "searchButton": "Search",
+      "searching": "Searching...",
+      "errors": {
+        "empty": "Please enter at least one keyword",
+        "generic": "Search failed, please try again later"
+      },
+      "summary": "Keywords: {keywords} | Mode: {mode} | {count} results found",
+      "summaryMode": {
+        "or": "OR search",
+        "and": "AND search"
+      },
+      "empty": "No posts matched those keywords",
+      "prompt": "Enter keywords and press search",
+      "hint": "Multiple keywords are supported; separate them with spaces",
+      "loadMore": "Load more",
+      "loadingMore": "Loading..."
+    }
+  }
+}

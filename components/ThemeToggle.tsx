@@ -2,20 +2,33 @@
 
 import { useTheme } from './ThemeProvider';
 import { Sun, Moon } from 'lucide-react';
+import homeCopy from '@/content/home.json';
+import { useLanguage } from './LanguageProvider';
 
-export function ThemeToggle() {
+interface ThemeToggleProps {
+  className?: string;
+}
+
+export function ThemeToggle({ className }: ThemeToggleProps = {}) {
   const { theme, toggleTheme } = useTheme();
+  const { language } = useLanguage();
+  const label = homeCopy[language].preferences.themeToggleAria;
+
+  const baseClasses =
+    'inline-flex h-9 w-9 items-center justify-center rounded-md border border-black/10 text-black transition-colors duration-300 hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10';
+  const mergedClasses = className ? `${baseClasses} ${className}` : baseClasses;
 
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-lg border border-black dark:border-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors"
-      aria-label="切换主题"
+      className={mergedClasses}
+      aria-label={label}
+      type="button"
     >
       {theme === 'light' ? (
-        <Moon className="h-5 w-5 text-black" />
+        <Moon className="h-4 w-4" />
       ) : (
-        <Sun className="h-5 w-5 text-white" />
+        <Sun className="h-4 w-4" />
       )}
     </button>
   );

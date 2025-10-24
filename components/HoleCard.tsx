@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { HoleWithComments } from '@/types';
 import { Star, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
+import pagesCopy from '@/content/pages.json';
 
 interface HoleCardProps {
   hole: HoleWithComments;
 }
 
 export function HoleCard({ hole }: HoleCardProps) {
+  const { language } = useLanguage();
+  const common = pagesCopy[language].common;
   const [showAllComments, setShowAllComments] = useState(false);
   const [visibleComments, setVisibleComments] = useState(2);
 
@@ -16,47 +20,58 @@ export function HoleCard({ hole }: HoleCardProps) {
     ? hole.comments
     : hole.comments.slice(0, visibleComments);
 
-  const loadMoreComments = () => {
-    if (visibleComments >= hole.comments.length) {
-      setShowAllComments(true);
-    } else {
-      setVisibleComments(prev => Math.min(prev + 5, hole.comments.length));
-    }
-  };
+  const locale = language === 'zh' ? 'zh-CN' : 'en-US';
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('zh-CN');
+    return new Date(dateString).toLocaleString(locale);
   };
 
-  const getReplyText = (comment: any) => {
-    if (comment.replied_to_cid) {
-      const repliedComment = hole.comments.find(c => c.cid === comment.replied_to_cid);
-      return repliedComment ? `回复 ${repliedComment.name}` : '回复评论';
+  const loadMoreComments = () => {
+    const newVisible = Math.min(visibleComments + 5, hole.comments.length);
+    setVisibleComments(newVisible);
+    if (newVisible >= hole.comments.length) {
+      setShowAllComments(true);
     }
-    return null;
   };
+
+  const getReplyText = (comment: HoleWithComments['comments'][number]) => {
+    if (!comment.replied_to_cid) {
+      return null;
+    }
+    const repliedComment = hole.comments.find(
+      (item) => item.cid === comment.replied_to_cid
+    );
+    if (repliedComment) {
+      return `${common.replyPrefix} ${repliedComment.name}`;
+    }
+    return common.replyFallback;
+  };
+
+  const loadMoreLabel = useMemo(() => {
+    if (visibleComments >= hole.comments.length) {
+      return common.expandAllComments;
+    }
+    const remaining = hole.comments.length - visibleComments;
+    return common.loadMoreComments.replace('{count}', remaining.toString());
+  }, [common, hole.comments.length, visibleComments]);
 
   return (
     <div className="border border-black dark:border-white rounded-lg p-6 bg-white dark:bg-black">
       <div className="flex justify-between items-start mb-4">
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          PID: {hole.pid}
-        </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400">{hole.pid}</div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {formatDate(hole.created_at)}
         </div>
       </div>
 
       <div className="mb-4">
-        <p className="text-black dark:text-white whitespace-pre-wrap">
-          {hole.text}
-        </p>
+        <p className="text-black dark:text-white whitespace-pre-wrap">{hole.text}</p>
         {hole.type === 'image' && hole.image_response && (
-          <div className="mt-4">
+          <div className="mt-4 flex justify-center">
             <img
               src={hole.image_response}
-              alt="树洞图片"
-              className="max-w-full h-auto rounded-lg border border-gray-300 dark:border-gray-700"
+              alt={common.imageAlt}
+              className="h-auto w-2/5 min-w-[160px] rounded-lg border border-gray-300 object-contain dark:border-gray-700"
             />
           </div>
         )}
@@ -76,12 +91,12 @@ export function HoleCard({ hole }: HoleCardProps) {
       {hole.comments.length > 0 && (
         <div className="border-t border-gray-300 dark:border-gray-700 pt-4">
           <h4 className="text-sm font-medium text-black dark:text-white mb-3">
-            评论 ({hole.comments.length})
+            {common.commentsHeading} ({hole.comments.length})
           </h4>
 
           <div className="space-y-3">
             {displayedComments.map((comment) => (
-              <div key={comment.cid} className="bg-gray-50 dark:bg-gray-900 p-3 rounded">
+              <div key={comment.cid} className="rounded bg-gray-50 p-3 dark:bg-gray-900">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-medium text-black dark:text-white">
@@ -107,15 +122,10 @@ export function HoleCard({ hole }: HoleCardProps) {
           {hole.comments.length > 2 && !showAllComments && (
             <button
               onClick={loadMoreComments}
-              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
             >
               <ChevronDown className="h-4 w-4" />
-              <span>
-                {visibleComments >= hole.comments.length
-                  ? '展开所有评论'
-                  : `加载更多评论 (${hole.comments.length - visibleComments} 条)`
-                }
-              </span>
+              <span>{loadMoreLabel}</span>
             </button>
           )}
 
@@ -125,10 +135,10 @@ export function HoleCard({ hole }: HoleCardProps) {
                 setShowAllComments(false);
                 setVisibleComments(2);
               }}
-              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+              className="mt-3 flex items-center space-x-1 text-sm text-gray-600 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
             >
               <ChevronUp className="h-4 w-4" />
-              <span>收起评论</span>
+              <span>{common.collapseComments}</span>
             </button>
           )}
         </div>

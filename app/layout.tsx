@@ -5,6 +5,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Ethan Hole',
   description: 'Ethan Club 树洞系统',
+  icons: {
+    icon: '/Ethan-Club-o.PNG',
+  },
 };
 
 export default function RootLayout({

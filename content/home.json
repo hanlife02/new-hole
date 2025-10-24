@@ -1,0 +1,112 @@
+{
+  "zh": {
+    "badge": "ETHAN HOLE",
+    "preferences": {
+      "label": "偏好设置",
+      "themeLabel": "主题",
+      "themeDescription": "点击切换明暗模式",
+      "themeToggleAria": "切换主题"
+    },
+    "navigation": {
+      "signOut": "退出登录",
+      "signOutAria": "退出登录",
+      "menuAria": "展开导航"
+    },
+    "hero": {
+      "title": "Welcome to Ethan Hole",
+      "subtitle": "你发现了一片神秘之地",
+      "imageAlt": "Ethan Club 标志"
+    },
+    "stats": {
+      "holes": "树洞数量",
+      "comments": "评论数量"
+    },
+    "quickAccess": {
+      "badge": "Quick Access",
+      "items": [
+        {
+          "href": "/latest",
+          "label": "最新树洞",
+          "description": "实时刷新，第一时间捕捉全新发言。"
+        },
+        {
+          "href": "/hot",
+          "label": "热点树洞",
+          "description": "综合热度与互动，锁定讨论焦点。"
+        },
+        {
+          "href": "/pidsearch",
+          "label": "洞号查询",
+          "description": "通过编号快速定位具体树洞。"
+        },
+        {
+          "href": "/keysearch",
+          "label": "内容搜索",
+          "description": "聚合检索结果，精准触达主题。"
+        }
+      ]
+    },
+    "language": {
+      "label": "语言",
+      "options": {
+        "zh": "中文",
+        "en": "English"
+      }
+    }
+  },
+  "en": {
+    "badge": "ETHAN HOLE",
+    "preferences": {
+      "label": "Preferences",
+      "themeLabel": "Theme",
+      "themeDescription": "Toggle between light and dark",
+      "themeToggleAria": "Toggle theme"
+    },
+    "navigation": {
+      "signOut": "Sign out",
+      "signOutAria": "Sign out",
+      "menuAria": "Open navigation"
+    },
+    "hero": {
+      "title": "Welcome to Ethan Hole",
+      "subtitle": "You have discovered a mysterious place",
+      "imageAlt": "Ethan Club logo"
+    },
+    "stats": {
+      "holes": "Posts",
+      "comments": "Comments"
+    },
+    "quickAccess": {
+      "badge": "Quick Access",
+      "items": [
+        {
+          "href": "/latest",
+          "label": "Latest",
+          "description": "See the newest conversations as soon as they arrive."
+        },
+        {
+          "href": "/hot",
+          "label": "Trending",
+          "description": "Stay on top of the most active threads in the community."
+        },
+        {
+          "href": "/pidsearch",
+          "label": "ID Search",
+          "description": "Jump straight to a specific treehole using its ID."
+        },
+        {
+          "href": "/keysearch",
+          "label": "Content Search",
+          "description": "Find topics instantly with precise keyword matching."
+        }
+      ]
+    },
+    "language": {
+      "label": "Language",
+      "options": {
+        "zh": "中文",
+        "en": "English"
+      }
+    }
+  }
+}

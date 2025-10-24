@@ -1,16 +1,19 @@
 'use client';
 
 import { useSession, signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Navigation } from '@/components/Navigation';
 import { HoleCard } from '@/components/HoleCard';
 import { HoleWithComments } from '@/types';
-import { RefreshCw, ChevronDown } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import pagesCopy from '@/content/pages.json';
+import { useLanguage } from '@/components/LanguageProvider';
 
 export default function LatestPage() {
   const { data: session, status } = useSession();
-  const router = useRouter();
+  const { language } = useLanguage();
+  const copy = pagesCopy[language].latest;
+  const common = pagesCopy[language].common;
   const [holes, setHoles] = useState<HoleWithComments[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,7 +29,7 @@ export default function LatestPage() {
     }
 
     fetchHoles();
-  }, [session, status, router]);
+  }, [session, status]);
 
   const fetchHoles = async (offset = 0, isRefresh = false) => {
     try {
@@ -65,9 +68,15 @@ export default function LatestPage() {
   };
 
   const loadMore = () => {
-    if (visibleCount >= holes.length && hasMore) {
-      fetchHoles(holes.length);
+    if (visibleCount >= holes.length) {
+      if (hasMore) {
+        fetchHoles(holes.length);
+      }
     } else {
+      const remaining = holes.length - visibleCount;
+      if (remaining < 20 && hasMore) {
+        fetchHoles(holes.length);
+      }
       setVisibleCount(prev => prev + 20);
     }
   };
@@ -77,7 +86,7 @@ export default function LatestPage() {
       <div className="min-h-screen bg-white dark:bg-black">
         <Navigation />
         <div className="flex items-center justify-center py-20">
-          <div className="text-black dark:text-white">加载中...</div>
+          <div className="text-black dark:text-white">{common.loading}</div>
         </div>
       </div>
     );
@@ -91,49 +100,44 @@ export default function LatestPage() {
   const canLoadMore = visibleCount < holes.length || hasMore;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-[#f5f5f7] dark:bg-black">
       <Navigation />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-black dark:text-white">
-            最新树洞
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex justify-between items-center mb-10">
+          <h1 className="text-4xl font-semibold text-black dark:text-white">
+            {copy.title}
           </h1>
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex items-center space-x-2 px-4 py-2 border border-black dark:border-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-medium hover:opacity-80 disabled:opacity-50"
           >
-            <RefreshCw className={`h-4 w-4 text-black dark:text-white ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="text-black dark:text-white">
-              {refreshing ? '刷新中...' : '刷新'}
-            </span>
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>{refreshing ? copy.refreshing : copy.refresh}</span>
           </button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           {displayedHoles.map((hole) => (
             <HoleCard key={hole.pid} hole={hole} />
           ))}
         </div>
 
         {displayedHoles.length === 0 && !loading && (
-          <div className="text-center py-20">
-            <div className="text-gray-600 dark:text-gray-400">暂无树洞</div>
+          <div className="text-center py-32">
+            <div className="text-gray-500 dark:text-gray-400 text-lg">{copy.empty}</div>
           </div>
         )}
 
         {canLoadMore && (
-          <div className="flex justify-center mt-8">
+          <div className="flex justify-center mt-12">
             <button
               onClick={loadMore}
               disabled={loadingMore}
-              className="flex items-center space-x-2 px-6 py-3 border border-black dark:border-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors disabled:opacity-50"
+              className="px-8 py-3 bg-white dark:bg-[#1d1d1f] text-black dark:text-white rounded-full text-sm font-medium hover:bg-gray-50 dark:hover:bg-[#2d2d2f] disabled:opacity-50"
             >
-              <ChevronDown className="h-4 w-4 text-black dark:text-white" />
-              <span className="text-black dark:text-white">
-                {loadingMore ? '加载中...' : '加载更多'}
-              </span>
+              {loadingMore ? copy.loadingMore : copy.loadMore}
             </button>
           </div>
         )}
