@@ -14,19 +14,7 @@ interface CasdoorProfile {
   avatar?: string;
 }
 
-type ExtendedToken = JWT & {
-  accessToken?: string;
-  refreshToken?: string;
-  expiresAt?: number;
-  error?: string;
-};
-
-type TokenResponse = {
-  access_token?: string;
-  refresh_token?: string;
-  expires_in?: number | string;
-  [key: string]: unknown;
-};
+type ExtendedToken = JWT;
 
 const casdoorEndpoint = process.env.CASDOOR_ENDPOINT
   ? process.env.CASDOOR_ENDPOINT.replace(/\/+$/, '')
@@ -49,27 +37,8 @@ function withCasdoorPath(path: string) {
   return `${ensureCasdoorEndpoint()}${path}`;
 }
 
-function parseTokenResponse(payload: string): TokenResponse {
-  try {
-    return JSON.parse(payload) as TokenResponse;
-  } catch {
-    const params = new URLSearchParams(payload);
-    const parsed: TokenResponse = {};
-
-    params.forEach((value, key) => {
-      parsed[key] = value;
-    });
-
-    return parsed;
-  }
-}
-
 function sanitizeToken(token: ExtendedToken): ExtendedToken {
   return {
-    accessToken: token.accessToken,
-    refreshToken: token.refreshToken,
-    expiresAt: token.expiresAt,
-    error: token.error,
     sub: token.sub,
     name: token.name,
     email: token.email,
@@ -78,65 +47,6 @@ function sanitizeToken(token: ExtendedToken): ExtendedToken {
     exp: token.exp,
     jti: token.jti,
   };
-}
-
-async function refreshAccessToken(token: ExtendedToken): Promise<ExtendedToken> {
-  if (!token.refreshToken) {
-    return {
-      ...token,
-      error: 'MissingRefreshToken',
-    };
-  }
-
-  const endpoint = withCasdoorPath('/api/login/oauth/access_token');
-  const params = new URLSearchParams({
-    grant_type: 'refresh_token',
-    refresh_token: token.refreshToken,
-  });
-
-  if (process.env.CASDOOR_CLIENT_ID) {
-    params.append('client_id', process.env.CASDOOR_CLIENT_ID);
-  }
-
-  if (process.env.CASDOOR_CLIENT_SECRET) {
-    params.append('client_secret', process.env.CASDOOR_CLIENT_SECRET);
-  }
-
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    });
-
-    const raw = await response.text();
-    const refreshedTokens = parseTokenResponse(raw);
-
-    if (!response.ok || !refreshedTokens.access_token) {
-      throw new Error(`Failed to refresh access token: ${response.status} ${raw}`);
-    }
-
-    const expiresIn = Number(refreshedTokens.expires_in);
-
-    return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-      expiresAt: Number.isFinite(expiresIn)
-        ? Date.now() + expiresIn * 1000
-        : token.expiresAt,
-      error: undefined,
-    };
-  } catch (error) {
-    console.error('Casdoor token refresh failed:', error);
-
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
-  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -257,53 +167,26 @@ export const authOptions: NextAuthOptions = {
     },
   },
   callbacks: {
-    async jwt({ token, account, user }) {
-      let extendedToken = token as ExtendedToken;
+    async jwt({ token, user }) {
+      const extendedToken: ExtendedToken = {
+        ...token,
+        name: user?.name ?? token.name,
+        email: user?.email ?? token.email,
+        sub: (user && 'id' in user ? (user.id as string) : undefined) ?? token.sub,
+        picture: user?.image ?? token.picture,
+      };
 
-      if (user) {
-        extendedToken = {
-          ...extendedToken,
-          name: user.name ?? extendedToken.name,
-          email: user.email ?? extendedToken.email,
-          sub: user.id ?? extendedToken.sub,
-          picture: user.image ?? extendedToken.picture,
-        };
+      const sanitized = sanitizeToken(extendedToken);
+
+      if (process.env.NEXTAUTH_DEBUG === 'true') {
+        console.debug('[next-auth][debug] sanitized keys', Object.keys(sanitized));
+        console.debug('[next-auth][debug] sanitized size', JSON.stringify(sanitized).length);
       }
 
-      if (account) {
-        const expiresAt = account.expires_at
-          ? account.expires_at * 1000
-          : account.expires_in
-            ? Date.now() + (Number(account.expires_in) * 1000)
-            : undefined;
-
-        extendedToken = {
-          ...extendedToken,
-          accessToken: account.access_token ?? extendedToken.accessToken,
-          refreshToken: account.refresh_token ?? extendedToken.refreshToken,
-          expiresAt,
-          error: undefined,
-        };
-
-        return sanitizeToken(extendedToken);
-      }
-
-      if (!extendedToken.expiresAt || Date.now() < extendedToken.expiresAt - 60_000) {
-        return sanitizeToken(extendedToken);
-      }
-
-      return sanitizeToken(await refreshAccessToken(extendedToken));
+      return sanitized;
     },
     async session({ session, token }) {
       const extendedToken = token as ExtendedToken;
-
-      if (extendedToken.accessToken) {
-        session.accessToken = extendedToken.accessToken;
-      }
-
-      if (extendedToken.error) {
-        session.error = extendedToken.error;
-      }
 
       return session;
     },
