@@ -64,6 +64,22 @@ function parseTokenResponse(payload: string): TokenResponse {
   }
 }
 
+function sanitizeToken(token: ExtendedToken): ExtendedToken {
+  return {
+    accessToken: token.accessToken,
+    refreshToken: token.refreshToken,
+    expiresAt: token.expiresAt,
+    error: token.error,
+    sub: token.sub,
+    name: token.name,
+    email: token.email,
+    picture: token.picture,
+    iat: token.iat,
+    exp: token.exp,
+    jti: token.jti,
+  };
+}
+
 async function refreshAccessToken(token: ExtendedToken): Promise<ExtendedToken> {
   if (!token.refreshToken) {
     return {
@@ -241,8 +257,18 @@ export const authOptions: NextAuthOptions = {
     },
   },
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
       let extendedToken = token as ExtendedToken;
+
+      if (user) {
+        extendedToken = {
+          ...extendedToken,
+          name: user.name ?? extendedToken.name,
+          email: user.email ?? extendedToken.email,
+          sub: user.id ?? extendedToken.sub,
+          picture: user.image ?? extendedToken.picture,
+        };
+      }
 
       if (account) {
         const expiresAt = account.expires_at
@@ -259,14 +285,14 @@ export const authOptions: NextAuthOptions = {
           error: undefined,
         };
 
-        return extendedToken;
+        return sanitizeToken(extendedToken);
       }
 
       if (!extendedToken.expiresAt || Date.now() < extendedToken.expiresAt - 60_000) {
-        return extendedToken;
+        return sanitizeToken(extendedToken);
       }
 
-      return refreshAccessToken(extendedToken);
+      return sanitizeToken(await refreshAccessToken(extendedToken));
     },
     async session({ session, token }) {
       const extendedToken = token as ExtendedToken;
