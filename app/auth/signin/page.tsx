@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import AutoSignIn from './AutoSignIn';
 
 type SignInPageProps = {
   searchParams?: {
@@ -13,14 +13,14 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
   let callbackUrl = '/';
 
   if (typeof rawCallback === 'string' && rawCallback.length > 0) {
+    callbackUrl = rawCallback;
+
     try {
-      callbackUrl = decodeURIComponent(rawCallback);
+      callbackUrl = decodeURIComponent(callbackUrl);
     } catch {
-      callbackUrl = rawCallback;
+      // ignore decoding issues and fall back to raw value
     }
   }
 
-  const target = `/api/auth/signin?provider=casdoor&callbackUrl=${encodeURIComponent(callbackUrl)}`;
-
-  redirect(target);
+  return <AutoSignIn callbackUrl={callbackUrl} />;
 }

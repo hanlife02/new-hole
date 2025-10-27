@@ -16,7 +16,7 @@ export default async function HotPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/auth/signin');
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent('/hot')}`);
   }
 
   return <HotPageClient initialFilters={{ ...DEFAULT_FILTERS }} />;
