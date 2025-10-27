@@ -1,35 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { HoleCard } from '@/components/HoleCard';
 import { useLanguage } from '@/components/LanguageProvider';
 import pagesCopy from '@/content/pages.json';
-import { HoleWithComments, HotHoleFilters } from '@/types';
+import { Hole, HotHoleFilters } from '@/types';
 
 interface HotPageClientProps {
   initialFilters: HotHoleFilters;
-  initialData: {
-    holes: HoleWithComments[];
-    total: number;
-    hasMore: boolean;
-  };
 }
 
-export function HotPageClient({ initialFilters, initialData }: HotPageClientProps) {
+export function HotPageClient({ initialFilters }: HotPageClientProps) {
   const { language } = useLanguage();
   const pageCopy = pagesCopy[language];
   const copy = pageCopy.hot;
   const common = pageCopy.common;
 
   const [filters, setFilters] = useState<HotHoleFilters>(initialFilters);
-  const [holes, setHoles] = useState<HoleWithComments[]>(initialData.holes);
-  const [total, setTotal] = useState(initialData.total);
-  const [hasMore, setHasMore] = useState(initialData.hasMore);
+  const [holes, setHoles] = useState<Hole[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [hasSearched, setHasSearched] = useState(true);
+  const [hasSearched, setHasSearched] = useState(false);
   const [customThreshold, setCustomThreshold] = useState('');
 
   const presetThresholds = [20, 50, 100, 300];
@@ -101,6 +96,11 @@ export function HotPageClient({ initialFilters, initialData }: HotPageClientProp
       setFilters((prev) => ({ ...prev, threshold: value }));
     }
   };
+
+  useEffect(() => {
+    fetchHoles(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] dark:bg-black">

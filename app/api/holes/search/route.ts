@@ -65,24 +65,8 @@ export async function GET(request: NextRequest) {
     const holes = holesResult.rows;
     const total = parseInt(countResult.rows[0].total);
 
-    const holesWithComments = await Promise.all(
-      holes.map(async (hole) => {
-        const commentsQuery = `
-          SELECT * FROM comments
-          WHERE pid = $1
-          ORDER BY created_at ASC
-        `;
-        const commentsResult = await pool.query(commentsQuery, [hole.pid]);
-
-        return {
-          ...hole,
-          comments: commentsResult.rows
-        };
-      })
-    );
-
     return NextResponse.json({
-      holes: holesWithComments,
+      holes,
       total,
       hasMore: offset + limit < total,
       searchInfo: {

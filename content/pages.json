@@ -5,10 +5,16 @@
       "commentsHeading": "评论",
       "expandAllComments": "展开所有评论",
       "loadMoreComments": "加载更多评论 ({count} 条)",
+      "loadMoreCommentsGeneral": "加载更多评论",
       "collapseComments": "收起评论",
       "replyPrefix": "回复",
       "replyFallback": "回复评论",
-      "imageAlt": "树洞图片"
+      "imageAlt": "树洞图片",
+      "showComments": "查看评论",
+      "loadingComments": "评论加载中...",
+      "noComments": "暂无评论",
+      "loadCommentsError": "评论加载失败",
+      "retry": "重试"
     },
     "latest": {
       "title": "最新树洞",
@@ -92,10 +98,16 @@
       "commentsHeading": "Comments",
       "expandAllComments": "Show all comments",
       "loadMoreComments": "Load more comments ({count} left)",
+      "loadMoreCommentsGeneral": "Load more comments",
       "collapseComments": "Collapse comments",
       "replyPrefix": "Reply to",
       "replyFallback": "Reply",
-      "imageAlt": "Treehole image"
+      "imageAlt": "Treehole image",
+      "showComments": "View comments",
+      "loadingComments": "Loading comments...",
+      "noComments": "No comments yet",
+      "loadCommentsError": "Failed to load comments",
+      "retry": "Retry"
     },
     "latest": {
       "title": "Latest Posts",

@@ -1,33 +1,23 @@
 'use client';
 
-import { useSession, signIn } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import { useState, type KeyboardEvent } from 'react';
 import { Navigation } from '@/components/Navigation';
+import { Hole } from '@/types';
 import { HoleCard } from '@/components/HoleCard';
-import { HoleWithComments } from '@/types';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
 import pagesCopy from '@/content/pages.json';
 
-export default function PidSearchPage() {
-  const { data: session, status } = useSession();
+export default function PidSearchPageClient() {
   const { language } = useLanguage();
   const pageCopy = pagesCopy[language];
   const copy = pageCopy.pid;
   const common = pageCopy.common;
   const [pid, setPid] = useState('');
-  const [hole, setHole] = useState<HoleWithComments | null>(null);
+  const [hole, setHole] = useState<Hole | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
-
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) {
-      signIn('casdoor');
-      return;
-    }
-  }, [session, status]);
 
   const handleSearch = async () => {
     if (!pid.trim()) {
@@ -35,8 +25,8 @@ export default function PidSearchPage() {
       return;
     }
 
-    const pidNumber = parseInt(pid.trim());
-    if (isNaN(pidNumber) || pidNumber <= 0) {
+    const pidNumber = parseInt(pid.trim(), 10);
+    if (Number.isNaN(pidNumber) || pidNumber <= 0) {
       setError(copy.errors.invalid);
       return;
     }
@@ -54,8 +44,8 @@ export default function PidSearchPage() {
       } else {
         setError(data.error || copy.errors.generic);
       }
-    } catch (error) {
-      console.error('PID查询失败:', error);
+    } catch (fetchError) {
+      console.error('PID查询失败:', fetchError);
       setError(copy.errors.generic);
     } finally {
       setLoading(false);
@@ -63,26 +53,11 @@ export default function PidSearchPage() {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleSearch();
+      void handleSearch();
     }
   };
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-white dark:bg-black">
-        <Navigation />
-        <div className="flex items-center justify-center py-20">
-          <div className="text-black dark:text-white">{common.loading}</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!session) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] dark:bg-black">
@@ -128,9 +103,15 @@ export default function PidSearchPage() {
           )}
         </div>
 
-        {hole && (
+        {loading && (
+          <div className="text-center py-20">
+            <div className="text-black dark:text-white">{common.loading}</div>
+          </div>
+        )}
+
+        {hole && !loading && (
           <div className="space-y-4">
-            <HoleCard hole={hole} />
+            <HoleCard hole={hole} autoLoadComments />
           </div>
         )}
 
@@ -142,7 +123,7 @@ export default function PidSearchPage() {
           </div>
         )}
 
-        {!hasSearched && (
+        {!hasSearched && !loading && (
           <div className="text-center py-32">
             <div className="text-gray-500 dark:text-gray-400 text-lg">
               {copy.prompt}

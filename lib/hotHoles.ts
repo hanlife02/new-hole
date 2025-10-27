@@ -4,6 +4,7 @@ import { Comment, Hole, HoleWithComments, HotHoleFilters } from '@/types';
 interface HotHoleQueryOptions {
   offset?: number;
   limit?: number;
+  includeComments?: boolean;
 }
 
 interface HotHoleQueryResult {
@@ -107,6 +108,7 @@ export async function fetchHotHoles(
   const normalizedFilters = normalizeFilters(filters);
   const offset = Math.max(0, options.offset ?? 0);
   const limit = Math.min(Math.max(options.limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
+  const includeComments = options.includeComments ?? false;
 
   const conditions: string[] = [];
   const conditionParams: Array<string | number | Date> = [];
@@ -155,6 +157,19 @@ export async function fetchHotHoles(
 
   if (holes.length === 0) {
     return { holes: [], total, hasMore: false };
+  }
+
+  if (!includeComments) {
+    const holesWithoutComments: HoleWithComments[] = holes.map((hole) => ({
+      ...hole,
+      comments: [],
+    }));
+
+    return {
+      holes: holesWithoutComments,
+      total,
+      hasMore: offset + holes.length < total,
+    };
   }
 
   const holePids = holes.map((hole) => hole.pid);

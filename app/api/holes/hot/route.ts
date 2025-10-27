@@ -35,9 +35,19 @@ export async function GET(request: NextRequest) {
     const offset = Math.max(0, parseNumber(searchParams.get('offset'), 0));
     const limit = Math.max(1, parseNumber(searchParams.get('limit'), 20));
 
-    const result = await fetchHotHoles(filters, { offset, limit });
+    const result = await fetchHotHoles(filters, {
+      offset,
+      limit,
+      includeComments: false,
+    });
 
-    return NextResponse.json(result);
+    const holes = result.holes.map(({ comments, ...hole }) => hole);
+
+    return NextResponse.json({
+      holes,
+      total: result.total,
+      hasMore: result.hasMore,
+    });
   } catch (error) {
     console.error('获取热点树洞失败:', error);
     return NextResponse.json(

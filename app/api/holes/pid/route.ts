@@ -33,19 +33,7 @@ export async function GET(request: NextRequest) {
 
     const hole = holeResult.rows[0];
 
-    const commentsQuery = `
-      SELECT * FROM comments
-      WHERE pid = $1
-      ORDER BY created_at ASC
-    `;
-    const commentsResult = await pool.query(commentsQuery, [pidNumber]);
-
-    const holeWithComments = {
-      ...hole,
-      comments: commentsResult.rows
-    };
-
-    return NextResponse.json({ hole: holeWithComments });
+    return NextResponse.json({ hole });
   } catch (error) {
     console.error('PID查询失败:', error);
     return NextResponse.json(

@@ -1,6 +1,8 @@
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
 import { HotPageClient } from './HotPageClient';
-import { fetchHotHoles } from '@/lib/hotHoles';
 import { HotHoleFilters } from '@/types';
+import { authOptions } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,23 +13,11 @@ const DEFAULT_FILTERS: HotHoleFilters = {
 };
 
 export default async function HotPage() {
-  const initialFilters: HotHoleFilters = { ...DEFAULT_FILTERS };
+  const session = await getServerSession(authOptions);
 
-  try {
-    const initialData = await fetchHotHoles(initialFilters, {
-      offset: 0,
-      limit: 20,
-    });
-
-    return <HotPageClient initialFilters={initialFilters} initialData={initialData} />;
-  } catch (error) {
-    console.error('获取热点树洞失败:', error);
-
-    return (
-      <HotPageClient
-        initialFilters={initialFilters}
-        initialData={{ holes: [], total: 0, hasMore: false }}
-      />
-    );
+  if (!session) {
+    redirect('/api/auth/signin?provider=casdoor');
   }
+
+  return <HotPageClient initialFilters={{ ...DEFAULT_FILTERS }} />;
 }

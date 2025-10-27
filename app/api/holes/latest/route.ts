@@ -32,24 +32,8 @@ export async function GET(request: NextRequest) {
     const hasMore = rows.length > queryLimit;
     const holes = rows.slice(0, queryLimit);
 
-    const holesWithComments = await Promise.all(
-      holes.map(async (hole) => {
-        const commentsQuery = `
-          SELECT * FROM comments
-          WHERE pid = $1
-          ORDER BY created_at ASC
-        `;
-        const commentsResult = await pool.query(commentsQuery, [hole.pid]);
-
-        return {
-          ...hole,
-          comments: commentsResult.rows
-        };
-      })
-    );
-
     return NextResponse.json({
-      holes: holesWithComments,
+      holes,
       hasMore,
     });
   } catch (error) {
