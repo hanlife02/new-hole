@@ -4,6 +4,26 @@ export default withAuth({
   pages: {
     signIn: '/auth/signin',
   },
+  cookies: {
+    sessionToken: {
+      name: 'next-auth.session-token',
+    },
+    callbackUrl: {
+      name: 'next-auth.callback-url',
+    },
+    csrfToken: {
+      name: 'next-auth.csrf-token',
+    },
+    pkceCodeVerifier: {
+      name: 'next-auth.pkce.code_verifier',
+    },
+    state: {
+      name: 'next-auth.state',
+    },
+    nonce: {
+      name: 'next-auth.nonce',
+    },
+  },
   callbacks: {
     authorized: ({ token }) => !!token,
   },
