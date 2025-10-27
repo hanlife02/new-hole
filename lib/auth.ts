@@ -24,7 +24,7 @@ const nextAuthUrl = process.env.NEXTAUTH_URL;
 const rawDefaultCallbackUrl =
   process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL && process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL.length > 0
     ? process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL
-    : '/callback';
+    : '/';
 
 const cookieSecure = nextAuthUrl
   ? nextAuthUrl.startsWith('https://')

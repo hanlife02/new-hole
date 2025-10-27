@@ -46,8 +46,13 @@ export function normalizeRelativeUrl(target: string | undefined, baseUrl?: strin
 }
 
 export function buildCallbackPath(returnTo: string, fallback: string = '/'): string {
-  const target = normalizeRelativeUrl(returnTo) ?? fallback;
-  const encoded = encodeURIComponent(target);
+  const normalizedTarget = normalizeRelativeUrl(returnTo);
 
-  return `/callback?returnTo=${encoded}`;
+  if (normalizedTarget) {
+    return normalizedTarget;
+  }
+
+  const normalizedFallback = normalizeRelativeUrl(fallback) ?? '/';
+
+  return normalizedFallback;
 }

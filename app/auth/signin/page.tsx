@@ -13,7 +13,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
   const rawCallback = searchParams?.callbackUrl;
   const baseUrl = process.env.NEXTAUTH_URL;
   const configuredDefault =
-    normalizeRelativeUrl(process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL, baseUrl) ?? '/callback';
+    normalizeRelativeUrl(process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL, baseUrl) ?? '/';
   let callbackUrl = configuredDefault;
 
   if (typeof rawCallback === 'string' && rawCallback.length > 0) {
