@@ -72,12 +72,13 @@ function resolveRedirectTarget(url: string | undefined, baseUrl: string) {
   try {
     const resolved = new URL(url, baseUrl);
     const base = new URL(baseUrl);
+    const casdoorOrigin = new URL(ensureCasdoorEndpoint()).origin;
 
-    if (resolved.origin !== base.origin) {
-      return fallback;
+    if (resolved.origin === base.origin || resolved.origin === casdoorOrigin) {
+      return resolved.toString();
     }
 
-    return resolved.toString();
+    return fallback;
   } catch {
     return fallback;
   }
@@ -172,7 +173,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: cookieSecure,
-        maxAge: 2000,
+        maxAge: 900,
       },
     },
     nonce: {
