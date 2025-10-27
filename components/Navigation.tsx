@@ -56,7 +56,7 @@ export function Navigation() {
             <ThemeToggle />
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+            onClick={() => signOut({ callbackUrl: '/' })}
             className="hidden items-center justify-center rounded-md border border-black/10 px-3 py-2 text-sm font-medium text-black transition-colors duration-300 hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10 md:inline-flex"
             aria-label={navigationCopy.signOutAria}
           >
@@ -97,7 +97,7 @@ export function Navigation() {
             <button
               onClick={() => {
                 closeMenu();
-                signOut({ callbackUrl: '/auth/signin' });
+                signOut({ callbackUrl: '/' });
               }}
               className="mt-4 inline-flex items-center justify-center rounded-md border border-black/10 px-3 py-2 text-sm font-medium text-black transition-colors duration-300 hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
             >

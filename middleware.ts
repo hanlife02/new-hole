@@ -2,7 +2,7 @@ import { withAuth } from 'next-auth/middleware';
 
 export default withAuth({
   pages: {
-    signIn: '/api/auth/signin?provider=casdoor',
+    signIn: '/auth/signin',
   },
   callbacks: {
     authorized: ({ token }) => !!token,

@@ -9,7 +9,7 @@ export default async function KeySearchPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/api/auth/signin?provider=casdoor');
+    redirect('/auth/signin');
   }
 
   return <KeySearchPageClient />;

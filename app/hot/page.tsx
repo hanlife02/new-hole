@@ -16,7 +16,7 @@ export default async function HotPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/api/auth/signin?provider=casdoor');
+    redirect('/auth/signin');
   }
 
   return <HotPageClient initialFilters={{ ...DEFAULT_FILTERS }} />;
