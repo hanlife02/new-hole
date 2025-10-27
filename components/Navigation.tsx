@@ -11,6 +11,12 @@ import { useLanguage } from './LanguageProvider';
 import homeCopy from '@/content/home.json';
 import Image from 'next/image';
 
+const DEFAULT_CALLBACK_URL =
+  process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL &&
+  process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL.startsWith('/')
+    ? process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL
+    : '/';
+
 export function Navigation() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,7 +62,7 @@ export function Navigation() {
             <ThemeToggle />
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={() => signOut({ callbackUrl: DEFAULT_CALLBACK_URL })}
             className="hidden items-center justify-center rounded-md border border-black/10 px-3 py-2 text-sm font-medium text-black transition-colors duration-300 hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10 md:inline-flex"
             aria-label={navigationCopy.signOutAria}
           >
@@ -97,7 +103,7 @@ export function Navigation() {
             <button
               onClick={() => {
                 closeMenu();
-                signOut({ callbackUrl: '/' });
+                signOut({ callbackUrl: DEFAULT_CALLBACK_URL });
               }}
               className="mt-4 inline-flex items-center justify-center rounded-md border border-black/10 px-3 py-2 text-sm font-medium text-black transition-colors duration-300 hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
             >

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { buildCallbackPath } from '@/lib/url';
 import KeySearchPageClient from './KeySearchPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,8 @@ export default async function KeySearchPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect(`/auth/signin?callbackUrl=${encodeURIComponent('/keysearch')}`);
+    const callbackPath = buildCallbackPath('/keysearch');
+    redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackPath)}`);
   }
 
   return <KeySearchPageClient />;

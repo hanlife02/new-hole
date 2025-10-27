@@ -1,3 +1,4 @@
+import { normalizeRelativeUrl } from '@/lib/url';
 import AutoSignIn from './AutoSignIn';
 
 type SignInPageProps = {
@@ -10,17 +11,26 @@ export const dynamic = 'force-dynamic';
 
 export default function SignInPage({ searchParams }: SignInPageProps) {
   const rawCallback = searchParams?.callbackUrl;
-  let callbackUrl = '/';
+  const baseUrl = process.env.NEXTAUTH_URL;
+  const configuredDefault =
+    normalizeRelativeUrl(process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL, baseUrl) ?? '/callback';
+  let callbackUrl = configuredDefault;
 
   if (typeof rawCallback === 'string' && rawCallback.length > 0) {
-    callbackUrl = rawCallback;
+    let decoded = rawCallback;
 
     try {
-      callbackUrl = decodeURIComponent(callbackUrl);
+      decoded = decodeURIComponent(rawCallback);
     } catch {
       // ignore decoding issues and fall back to raw value
     }
+
+    const normalized = normalizeRelativeUrl(decoded, baseUrl);
+
+    if (normalized) {
+      callbackUrl = normalized;
+    }
   }
 
-  return <AutoSignIn callbackUrl={callbackUrl} />;
+  return <AutoSignIn callbackUrl={callbackUrl} defaultCallbackUrl={configuredDefault} />;
 }

@@ -21,6 +21,11 @@ const casdoorEndpoint = process.env.CASDOOR_ENDPOINT
   : undefined;
 
 const nextAuthUrl = process.env.NEXTAUTH_URL;
+const rawDefaultCallbackUrl =
+  process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL && process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL.length > 0
+    ? process.env.NEXT_PUBLIC_DEFAULT_CALLBACK_URL
+    : '/callback';
+
 const cookieSecure = nextAuthUrl
   ? nextAuthUrl.startsWith('https://')
   : process.env.NODE_ENV === 'production';
@@ -47,6 +52,35 @@ function sanitizeToken(token: ExtendedToken): ExtendedToken {
     exp: token.exp,
     jti: token.jti,
   };
+}
+
+function resolveDefaultRedirect(baseUrl: string) {
+  try {
+    return new URL(rawDefaultCallbackUrl, baseUrl).toString();
+  } catch {
+    return baseUrl;
+  }
+}
+
+function resolveRedirectTarget(url: string | undefined, baseUrl: string) {
+  const fallback = resolveDefaultRedirect(baseUrl);
+
+  if (!url) {
+    return fallback;
+  }
+
+  try {
+    const resolved = new URL(url, baseUrl);
+    const base = new URL(baseUrl);
+
+    if (resolved.origin !== base.origin) {
+      return fallback;
+    }
+
+    return resolved.toString();
+  } catch {
+    return fallback;
+  }
 }
 
 export const authOptions: NextAuthOptions = {
@@ -189,6 +223,9 @@ export const authOptions: NextAuthOptions = {
       const extendedToken = token as ExtendedToken;
 
       return session;
+    },
+    async redirect({ url, baseUrl }) {
+      return resolveRedirectTarget(url, baseUrl);
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
