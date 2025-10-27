@@ -172,7 +172,7 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: cookieSecure,
-        maxAge: 900,
+        maxAge: 2000,
       },
     },
     nonce: {
