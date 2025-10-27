@@ -172,6 +172,10 @@ export function HoleCard({ hole, initialComments, autoLoadComments = false }: Ho
     setShowAllComments(true);
   };
 
+  const hasAnyComments = comments.length > 0 || hole.reply > 0 || hasMoreComments;
+  const shouldShowToggle = hasAnyComments || loadingComments || commentsError;
+  const shouldRenderCommentsSection = showComments && (hasAnyComments || loadingComments || commentsError);
+
   return (
     <div className="bg-white dark:bg-[#1d1d1f] rounded-2xl p-6 shadow-sm">
       <div className="flex justify-between items-start mb-4">
@@ -229,32 +233,34 @@ export function HoleCard({ hole, initialComments, autoLoadComments = false }: Ho
         </div>
       </div>
 
-      <div className="mt-4">
-        <button
-          onClick={handleToggleComments}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
-        >
-          {showComments ? (
-            loadingComments && comments.length === 0 ? (
+      {shouldShowToggle && (
+        <div className="mt-4">
+          <button
+            onClick={handleToggleComments}
+            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white"
+          >
+            {showComments ? (
+              loadingComments && comments.length === 0 ? (
+                <span>{common.loadingComments}</span>
+              ) : (
+                <>
+                  <ChevronUp className="h-4 w-4" />
+                  <span>{common.collapseComments}</span>
+                </>
+              )
+            ) : loadingComments ? (
               <span>{common.loadingComments}</span>
             ) : (
               <>
-                <ChevronUp className="h-4 w-4" />
-                <span>{common.collapseComments}</span>
+                <ChevronDown className="h-4 w-4" />
+                <span>{common.showComments}</span>
               </>
-            )
-          ) : loadingComments ? (
-            <span>{common.loadingComments}</span>
-          ) : (
-            <>
-              <ChevronDown className="h-4 w-4" />
-              <span>{common.showComments}</span>
-            </>
-          )}
-        </button>
-      </div>
+            )}
+          </button>
+        </div>
+      )}
 
-      {showComments && (
+      {shouldRenderCommentsSection && (
         <div className="border-t border-gray-100 dark:border-gray-800 pt-5 mt-4">
           <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-4">
             {common.commentsHeading} ({commentsLoaded ? comments.length : hole.reply})
