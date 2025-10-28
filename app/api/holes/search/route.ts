@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import { ensureSearchInfrastructure } from '@/lib/searchSetup';
 
 export async function GET(request: NextRequest) {
   try {
+    try {
+      await ensureSearchInfrastructure();
+    } catch (setupError) {
+      console.warn('关键词搜索索引初始化失败:', setupError);
+    }
+
     const { searchParams } = new URL(request.url);
     const keywords = searchParams.get('keywords');
     const searchType = searchParams.get('searchType') || 'or';
