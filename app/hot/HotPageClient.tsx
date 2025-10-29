@@ -10,9 +10,10 @@ import { Hole, HotHoleFilters } from '@/types';
 
 interface HotPageClientProps {
   initialFilters: HotHoleFilters;
+  recentHoleLimit: number;
 }
 
-export function HotPageClient({ initialFilters }: HotPageClientProps) {
+export function HotPageClient({ initialFilters, recentHoleLimit }: HotPageClientProps) {
   const { language } = useLanguage();
   const pageCopy = pagesCopy[language];
   const copy = pageCopy.hot;
@@ -197,6 +198,10 @@ export function HotPageClient({ initialFilters }: HotPageClientProps) {
             <Search className="h-4 w-4" />
             <span>{loading ? copy.searching : copy.searchButton}</span>
           </button>
+
+          <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+            {copy.limitNote.replace('{limit}', recentHoleLimit.toString())}
+          </p>
         </div>
 
         {hasSearched && (

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { ensureSearchInfrastructure } from '@/lib/searchSetup';
+import { RECENT_HOLE_LIMIT } from '@/lib/constants';
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,41 +33,48 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    let whereCondition = '';
-    let queryParams: string[] = [];
+    const keywordParams: Array<string | number> = [];
+    const conditions = keywordList.map((keyword) => {
+      keywordParams.push(`%${keyword}%`);
+      return `text ILIKE $${keywordParams.length}`;
+    });
 
-    if (searchType === 'and') {
-      const conditions = keywordList.map((_, index) => {
-        queryParams.push(`%${keywordList[index]}%`);
-        return `text ILIKE $${queryParams.length}`;
-      });
-      whereCondition = `WHERE ${conditions.join(' AND ')}`;
-    } else {
-      const conditions = keywordList.map((_, index) => {
-        queryParams.push(`%${keywordList[index]}%`);
-        return `text ILIKE $${queryParams.length}`;
-      });
-      whereCondition = `WHERE ${conditions.join(' OR ')}`;
-    }
+    const conjunction = searchType === 'and' ? ' AND ' : ' OR ';
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(conjunction)}` : '';
 
-    queryParams.push(limit.toString());
-    queryParams.push(offset.toString());
+    const limitPosition = keywordParams.length + 1;
+    const offsetPosition = keywordParams.length + 2;
+    const holesParams: Array<string | number> = [...keywordParams, limit, offset];
 
     const holesQuery = `
-      SELECT * FROM holes
-      ${whereCondition}
+      WITH recent_holes AS (
+        SELECT *
+        FROM holes
+        ORDER BY created_at DESC
+        LIMIT ${RECENT_HOLE_LIMIT}
+      )
+      SELECT *
+      FROM recent_holes
+      ${whereClause}
       ORDER BY created_at DESC
-      LIMIT $${queryParams.length - 1} OFFSET $${queryParams.length}
+      LIMIT $${limitPosition} OFFSET $${offsetPosition}
     `;
 
     const countQuery = `
-      SELECT COUNT(*) as total FROM holes
-      ${whereCondition}
+      WITH recent_holes AS (
+        SELECT *
+        FROM holes
+        ORDER BY created_at DESC
+        LIMIT ${RECENT_HOLE_LIMIT}
+      )
+      SELECT COUNT(*) as total
+      FROM recent_holes
+      ${whereClause}
     `;
 
     const [holesResult, countResult] = await Promise.all([
-      pool.query(holesQuery, queryParams),
-      pool.query(countQuery, queryParams.slice(0, -2))
+      pool.query(holesQuery, holesParams),
+      pool.query(countQuery, keywordParams)
     ]);
 
     const holes = holesResult.rows;

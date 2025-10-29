@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { buildCallbackPath } from '@/lib/url';
 import KeySearchPageClient from './KeySearchPageClient';
+import { RECENT_HOLE_LIMIT } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,5 +15,5 @@ export default async function KeySearchPage() {
     redirect(`/auth/signin?callbackUrl=${encodeURIComponent(callbackPath)}`);
   }
 
-  return <KeySearchPageClient />;
+  return <KeySearchPageClient recentHoleLimit={RECENT_HOLE_LIMIT} />;
 }

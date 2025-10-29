@@ -8,6 +8,10 @@ import { Search } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
 import pagesCopy from '@/content/pages.json';
 
+interface KeySearchPageClientProps {
+  recentHoleLimit: number;
+}
+
 interface SearchResult {
   holes: Hole[];
   total: number;
@@ -20,7 +24,7 @@ interface SearchResult {
   error?: string;
 }
 
-export default function KeySearchPageClient() {
+export default function KeySearchPageClient({ recentHoleLimit }: KeySearchPageClientProps) {
   const { language } = useLanguage();
   const pageCopy = pagesCopy[language];
   const copy = pageCopy.keySearch;
@@ -158,6 +162,10 @@ export default function KeySearchPageClient() {
               <Search className="h-4 w-4" />
               <span>{loading ? copy.searching : copy.searchButton}</span>
             </button>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {copy.limitNote.replace('{limit}', recentHoleLimit.toString())}
+            </p>
 
             {error && (
               <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl">

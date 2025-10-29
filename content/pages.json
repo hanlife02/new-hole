@@ -47,6 +47,7 @@
       },
       "searchButton": "查询",
       "searching": "查询中...",
+      "limitNote": "当前仅支持检索最近{limit}条树洞",
       "results": "找到 {count} 个符合条件的热点树洞",
       "empty": "没有找到符合条件的热点树洞",
       "prompt": "请设置筛选条件并点击查询按钮",
@@ -80,6 +81,7 @@
         "empty": "请输入关键词",
         "generic": "搜索失败，请稍后重试"
       },
+      "limitNote": "关键词检索仅覆盖最新{limit}条树洞",
       "summary": "搜索关键词: {keywords} | 搜索方式: {mode} | 找到 {count} 个结果",
       "summaryMode": {
         "or": "或搜索",
@@ -140,6 +142,7 @@
       },
       "searchButton": "Search",
       "searching": "Searching...",
+      "limitNote": "Trending ranking only considers the latest {limit} posts",
       "results": "{count} trending posts match your filters",
       "empty": "No trending posts match your filters",
       "prompt": "Adjust the filters, then tap search to continue",
@@ -173,6 +176,7 @@
         "empty": "Please enter at least one keyword",
         "generic": "Search failed, please try again later"
       },
+      "limitNote": "Keyword search only covers the latest {limit} posts",
       "summary": "Keywords: {keywords} | Mode: {mode} | {count} results found",
       "summaryMode": {
         "or": "OR search",

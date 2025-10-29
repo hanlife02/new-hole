@@ -1,4 +1,5 @@
 import pool from '@/lib/db';
+import { RECENT_HOLE_LIMIT } from '@/lib/constants';
 import { Comment, Hole, HoleWithComments, HotHoleFilters } from '@/types';
 
 interface HotHoleQueryOptions {
@@ -130,9 +131,19 @@ export async function fetchHotHoles(
   const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
   const orderClause = getOrdering(normalizedFilters.sortBy);
 
+  const baseQuery = `
+    WITH recent_holes AS (
+      SELECT *
+      FROM holes
+      ORDER BY created_at DESC
+      LIMIT ${RECENT_HOLE_LIMIT}
+    )
+  `;
+
   const holesQuery = `
+    ${baseQuery}
     SELECT h.*
-    FROM holes h
+    FROM recent_holes h
     ${whereClause}
     ${orderClause}
     LIMIT $${conditionParams.length + 1}
@@ -142,8 +153,9 @@ export async function fetchHotHoles(
   const holesParams = [...conditionParams, limit, offset];
 
   const countQuery = `
+    ${baseQuery}
     SELECT COUNT(*)::int AS total
-    FROM holes h
+    FROM recent_holes h
     ${whereClause}
   `;
 
